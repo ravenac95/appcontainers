@@ -1,0 +1,10 @@
+requirements:
+  - ipaddr
+
+---
+profile: development
+
+requirements:
+  - nose
+  - testkit
+  - mock
