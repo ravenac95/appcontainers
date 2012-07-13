@@ -51,6 +51,5 @@ def available_ip(used_ips, network):
         raise Unavailable('No IP Address available in %s' % network)
     return found_ip
 
-def available_mac():
+def available_mac(used_macs):
     pass
-

@@ -23,9 +23,9 @@ class TestResourceService(object):
         self.mock_reservation_cls = reservation_cls
         self.mock_repository = resource_repository
 
-    @patch('appcontainers.resources.available_name')
-    @patch('appcontainers.resources.available_ip')
-    @patch('appcontainers.resources.available_mac')
+    @patch('appcontainers.resources.available_name', autospec=True)
+    @patch('appcontainers.resources.available_ip', autospec=True)
+    @patch('appcontainers.resources.available_mac', autospec=True)
     def test_make_reservation(self, mock_mac, mock_ip, mock_name):
         # Run test
         reservation = self.service.make_reservation()
@@ -65,3 +65,11 @@ def test_available_ips_none():
     network = ipaddr.IPv4Network('192.168.0.0/32')
     used = []
     available_ip(used, network)
+
+def test_available_mac():
+    used = ['00:16:3e:00:00:00',
+            '00:16:3e:00:00:02',
+            '00:16:3e:00:00:03',
+            ]
+    mac = available_mac(used)
+    assert mac == '00:16:3e:00:00:04'
