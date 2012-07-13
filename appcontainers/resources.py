@@ -12,12 +12,12 @@ class Unavailable(Exception):
 
 class ResourceService(object):
     def __init__(self, repository, settings, reservation_cls=None):
-        self.repository = repository
-        self.settings = settings
-        self.reservation_cls = reservation_cls
+        self._repository = repository
+        self._settings = settings
+        self._reservation_cls = reservation_cls
 
     def make_reservation(self):
-        reservations = self.repository.all()
+        reservations = self._repository.all()
         # Arrays to track each used resource
         names = []
         ips = []
@@ -29,11 +29,11 @@ class ResourceService(object):
             macs.append(reservation.mac)
         # Generate available resources
         name = available_name(names)
-        ip = available_ip(ips, self.settings.network)
-        mac = available_mac(macs, self.settings.mac_range)
+        ip = available_ip(ips, self._settings.network)
+        mac = available_mac(macs, self._settings.mac_range)
 
         reservation = self.reservation_cls.create(name, ip, mac)
-        self.repository.save(reservation)
+        self._repository.save(reservation)
         return reservation
 
 
