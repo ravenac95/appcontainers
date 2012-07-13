@@ -32,7 +32,7 @@ class ResourceService(object):
         ip = available_ip(ips, self._settings.network)
         mac = available_mac(macs, self._settings.mac_range)
 
-        reservation = self.reservation_cls.create(name, ip, mac)
+        reservation = self._reservation_cls.create(name, ip, mac)
         self._repository.save(reservation)
         return reservation
 
