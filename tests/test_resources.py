@@ -33,12 +33,13 @@ class TestResourceService(object):
         # Assertions
         mock_name.assert_called_with(['a', 'b', 'c'])
         mock_ip.assert_called_with(['ip_a', 'ip_b', 'ip_c'], ANY)
-        mock_mac.assert_called_with(['mac_a', 'mac_b', 'mac_c'])
-   
+        mock_mac.assert_called_with(['mac_a', 'mac_b', 'mac_c'], ANY)
+
         self.mock_reservation_cls.create.assert_called_with(
-                mock_name.return_value, mock_ip.return_value, 
+                mock_name.return_value, mock_ip.return_value,
                 mock_mac.return_value)
         assert reservation == self.mock_reservation_cls.create.return_value
+
 
 def test_available_name():
     # FIXME this isn't a good test. It might fail sometimes
@@ -46,10 +47,11 @@ def test_available_name():
     name = available_name(used)
     assert not name in used
 
+
 def test_available_ips():
-    used1 = [ipaddr.IPv4Address('192.168.0.1'), 
+    used1 = [ipaddr.IPv4Address('192.168.0.1'),
             ipaddr.IPv4Address('192.168.0.3')]
-    used2 = [ipaddr.IPv4Address('192.168.0.1'), 
+    used2 = [ipaddr.IPv4Address('192.168.0.1'),
             ipaddr.IPv4Address('192.168.0.2'),
             ipaddr.IPv4Address('192.168.0.3')]
     network_object = ipaddr.IPv4Network('192.168.0.0/24')
@@ -60,16 +62,60 @@ def test_available_ips():
     assert ip1 == ipaddr.IPv4Address('192.168.0.2')
     assert ip2 == ipaddr.IPv4Address('192.168.0.4')
 
+
 @raises(Unavailable)
 def test_available_ips_none():
     network = ipaddr.IPv4Network('192.168.0.0/32')
     used = []
     available_ip(used, network)
 
+
 def test_available_mac():
-    used = ['00:16:3e:00:00:00',
-            '00:16:3e:00:00:02',
-            '00:16:3e:00:00:03',
-            ]
-    mac = available_mac(used)
-    assert mac == '00:16:3e:00:00:04'
+    used1 = [
+        '00:16:3e:00:00:00',
+        '00:16:3e:00:00:01',
+        '00:16:3e:00:00:02',
+        '00:16:3e:00:00:03',
+    ]
+    used2 = [
+        '00:16:3e:00:00:00',
+        '00:16:3e:00:00:01',
+        '00:16:3e:00:00:03',
+        '00:16:3e:00:00:04',
+    ]
+    mac_range = ['00:16:3e:00:00:00', '00:16:3e:00:00:ff']
+    mac1 = available_mac(used1, mac_range)
+    mac2 = available_mac(used2, mac_range)
+
+    assert mac1 == '00:16:3e:00:00:04'
+    #assert mac2 == '00:16:3e:00:00:02'
+
+
+def test_mac_str_to_int():
+    tests = [
+        ('00:16:3e:00:00:00', 95529467904),
+        ('00:16:3e:00:ff:00', 95529533184),
+        ('00:00:00:00:00:00', 0),
+        ('ff:ff:ff:ff:ff:ff', 281474976710655),
+    ]
+    for test, expected in tests:
+        yield do_mac_str_to_int, test, expected
+
+
+def do_mac_str_to_int(test, expected):
+    assert mac_str_to_int(test) == expected
+
+
+def test_mac_int_to_str():
+    tests = [
+        (95529467904, '00:16:3e:00:00:00'),
+        (95529533184, '00:16:3e:00:ff:00'),
+        (0, '00:00:00:00:00:00'),
+        (281474976710655, 'ff:ff:ff:ff:ff:ff'),
+    ]
+    for test, expected in tests:
+        yield do_mac_int_to_str, test, expected
+
+
+def do_mac_int_to_str(test, expected):
+    assert mac_int_to_str(test) == expected
