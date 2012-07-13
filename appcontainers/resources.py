@@ -61,7 +61,7 @@ def available_mac(used_macs, mac_range):
     mac_int_range = map(mac_str_to_int, mac_range)
 
     found_mac = None
-    for mac in range(*mac_int_range):
+    for mac in xrange(*mac_int_range):
         mac_str = mac_int_to_str(mac)
         if not mac_str in used_macs:
             found_mac = mac_str
