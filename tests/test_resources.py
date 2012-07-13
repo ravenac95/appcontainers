@@ -64,7 +64,7 @@ def test_available_ips():
 
 
 @raises(Unavailable)
-def test_available_ips_none():
+def test_available_ips_fails():
     network = ipaddr.IPv4Network('192.168.0.0/32')
     used = []
     available_ip(used, network)
@@ -88,7 +88,13 @@ def test_available_mac():
     mac2 = available_mac(used2, mac_range)
 
     assert mac1 == '00:16:3e:00:00:04'
-    #assert mac2 == '00:16:3e:00:00:02'
+    assert mac2 == '00:16:3e:00:00:02'
+
+@raises(Unavailable)
+def test_available_mac_fails():
+    mac_range = ['00:16:3e:00:00:00', '00:16:3e:00:00:00']
+    used = []
+    available_mac(used, mac_range)
 
 
 def test_mac_str_to_int():

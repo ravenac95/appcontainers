@@ -53,12 +53,23 @@ def available_ip(used_ips, network):
             found_ip = ip
             break
     if not found_ip:
-        raise Unavailable('No IP Address available in %s' % network)
+        raise Unavailable('No IP Address available in network: %s' % network)
     return found_ip
 
 
 def available_mac(used_macs, mac_range):
-    return '00:16:3e:00:00:04'
+    mac_int_range = map(mac_str_to_int, mac_range)
+
+    found_mac = None
+    for mac in range(*mac_int_range):
+        mac_str = mac_int_to_str(mac)
+        if not mac_str in used_macs:
+            found_mac = mac_str
+            break
+    if not found_mac:
+        range_str = ' - '.join(mac_range)
+        raise Unavailable('No Mac Address available in range: %s' % range_str)
+    return found_mac
 
 
 def mac_str_to_int(mac_str):
