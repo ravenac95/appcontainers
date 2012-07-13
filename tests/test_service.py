@@ -27,4 +27,3 @@ class TestAppContainerService(object):
     def test_service_overlay_path(self):
         expected = '/var/lib/appcontainers/%s/hello' % constants.OVERLAYS_DIR
         assert self.service.overlays_path('hello') == expected
-

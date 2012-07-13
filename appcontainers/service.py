@@ -23,8 +23,8 @@ class AppContainerService(object):
     def provision(self, base='base'):
         """Provision a new app container using the default base"""
         # Setup the information for the container
-        resources = self._resource_service.make_reservation()
-        return self._creator.provision_container(resources)
+        resource_reservation = self._resource_service.make_reservation()
+        return self._creator.provision_container(resource_reservation)
 
     def service_path(self, *join_paths):
         return os.path.join(self._base_path, *join_paths)
