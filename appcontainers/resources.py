@@ -18,21 +18,22 @@ class ResourceService(object):
 
     def make_reservation(self):
         reservations = self.repository.all()
-
+        # Arrays to track each used resource
         names = []
         ips = []
         macs = []
-
+        # Collect used resources
         for reservation in reservations:
             names.append(reservation.name)
             ips.append(reservation.ip)
             macs.append(reservation.mac)
-
+        # Generate available resources
         name = available_name(names)
         ip = available_ip(ips, self.settings.network)
         mac = available_mac(macs, self.settings.mac_range)
 
         reservation = self.reservation_cls.create(name, ip, mac)
+        self.repository.save(reservation)
         return reservation
 
 

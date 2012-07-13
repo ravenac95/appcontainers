@@ -34,6 +34,10 @@ class TestResourceService(object):
     @patch('appcontainers.resources.available_ip', autospec=True)
     @patch('appcontainers.resources.available_mac', autospec=True)
     def test_make_reservation(self, mock_mac, mock_ip, mock_name):
+        # Inspect the save method
+        mock_save = Mock()
+        self.mock_repository.save = mock_save
+
         # Run test
         reservation = self.service.make_reservation()
 
@@ -45,11 +49,13 @@ class TestResourceService(object):
         self.mock_reservation_cls.create.assert_called_with(
                 mock_name.return_value, mock_ip.return_value,
                 mock_mac.return_value)
-        assert reservation == self.mock_reservation_cls.create.return_value
+        created_reservation = self.mock_reservation_cls.create.return_value
+        mock_save.assert_called_with(created_reservation)
+        assert reservation == created_reservation
 
 
 def test_available_name():
-    # FIXME this isn't a good test. It might fail sometimes
+    # FIXME this isn't a good test. It doesn't really tell us anything
     used = ['a', 'b', 'c']
     name = available_name(used)
     assert not name in used
@@ -97,6 +103,7 @@ def test_available_mac():
     assert mac1 == '00:16:3e:00:00:04'
     assert mac2 == '00:16:3e:00:00:02'
 
+
 @raises(Unavailable)
 def test_available_mac_fails():
     mac_range = ['00:16:3e:00:00:00', '00:16:3e:00:00:00']
@@ -132,6 +139,7 @@ def test_mac_int_to_str():
 
 def do_mac_int_to_str(test, expected):
     assert mac_int_to_str(test) == expected
+
 
 @attr('medium')
 def test_resource_service_making_resources():
