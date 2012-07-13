@@ -1,32 +1,25 @@
-import mock
+from mock import Mock
 from appcontainers import constants 
 from appcontainers.service import *
 
-def test_initialize_service():
-    service = AppContainerService()
-
-class FakeAppContainerService(AppContainerService):
-    reservations = dict(ip='0.0.0.0', mac='00:00:00:00:00:00')
-    random_name = 'somename'
-
-    def _reserve_network_resources(self):
-        return self.reservations
-
-    def _random_name(self):
-        return self.random_name
-
 class TestAppContainerService(object):
     def setup(self):
-        self.service = FakeAppContainerService()
+        resource_service = Mock()
+        creator = Mock()
+        self.service = AppContainerService(
+                resource_service=resource_service,
+                creator=creator)
+        self.mock_resource_service = resource_service
+        self.mock_creator = creator
 
-    @mock.patch('appcontainers.service.AppContainerBuilder')
-    def test_service_provision(self, builder):
-        FakeService = FakeAppContainerService
-        options = dict(name=FakeService.random_name)
-        options['network'] = FakeAppContainerService.reservations
-
+    def test_service_provision(self):
+        # Run Test
         self.service.provision()
-        builder.return_value.provision_container.assert_called_with(options)
+        
+        # Assertions
+        self.mock_resource_service.make_reservation.assert_called_with()
+        self.mock_creator.provision_container.assert_called_with(
+                self.mock_resource_service.make_reservation.return_value)
 
     def test_service_service_path(self):
         assert self.service.service_path('hello') == '/var/lib/appcontainers/hello'
