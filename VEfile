@@ -8,3 +8,4 @@ requirements:
   - nose
   - testkit
   - mock
+  - ipython
