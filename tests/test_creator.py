@@ -18,15 +18,16 @@ class TestAppContainerCreator(object):
         self.mock_settings = mock_settings
         self.mock_app_container_cls = mock_app_container_cls
         self.mock_lxc_service = mock_lxc_service
-        self.mock_file_loader = mock_file_loader
+        self.mock_file_assembler = mock_file_assembler
     
     def test_app_container_creator_provision_container(self):
         fake_reservation = FakeResourceReservation.create('somename', 
                 '192.168.0.1', '00:16:3e:00:00:00')
         container = self.creator.provision_container('base', fake_reservation)
         # Mock Assertions
-        self.mock_file_loader.setup.assert_called_with(
-                self.mock_lxc_service.create.return_value)
+        self.mock_file_assembler.setup.assert_called_with(
+                self.mock_lxc_service.create.return_value,
+                fake_reservation)
 
 
         # Assert return value
