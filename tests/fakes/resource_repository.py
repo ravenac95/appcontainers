@@ -29,3 +29,7 @@ class FakeResourceReservationRepository(object):
     def all(self):
         """Returns a sorted list of all resources"""
         return sorted(self._resources.values(), key=lambda a: a.name)
+
+    def save(self, reservation):
+        """Fake saves a reservation"""
+        pass
