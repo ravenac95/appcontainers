@@ -1,5 +1,11 @@
+import ipaddr
 
 class FakeResourceReservation(object):
+    @classmethod
+    def create(cls, name, ip, mac):
+        ip = ipaddr.IPv4Address(ip)
+        return cls(name, ip, mac)
+
     def __init__(self, name, ip, mac):
         self.name = name
         self.ip = ip
@@ -17,7 +23,7 @@ class FakeResourceReservationRepository(object):
         """Sets up fake ResourceReservations"""
         resources = self._resources
         for reservation_tuple in reservations:
-            resources[reservation_tuple[0]] = FakeResourceReservation(
+            resources[reservation_tuple[0]] = FakeResourceReservation.create(
                     *reservation_tuple)
 
     def all(self):
