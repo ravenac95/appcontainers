@@ -81,7 +81,7 @@ class TestFileAssembler(object):
         mock_writer.copy.assert_has_calls(expected_copy_calls, any_order=True)
         
         #### LXCSkeletonWriter.make_dir assertions
-        expected_make_dir_calls = [
+        expected_ensure_dir_calls = [
             call('somedir/hello'),
         ]
-        mock_writer.make_dir.assert_has_calls(expected_make_dir_calls)
+        mock_writer.ensure_dir.assert_has_calls(expected_ensure_dir_calls)
