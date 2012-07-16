@@ -45,6 +45,10 @@ default::
             - image/ - Image overlays
             - raw/ - Raw overlays (this is not mounted nor squashed)
         - resources.json - Current state of the network resources
+        - skeletons/ - Skeleton files for use in starting, provisioning, or
+            loading containers. Tempita templates can be used here and the
+            reservation object will be passed into the context
+            
 
 Possible use examples
 ---------------------
