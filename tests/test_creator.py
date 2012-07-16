@@ -1,4 +1,4 @@
-from mock import Mock, patch
+from mock import Mock
 from appcontainers.creator import *
 from tests.fakes import *
 
@@ -26,11 +26,9 @@ class TestAppContainerCreator(object):
         container = self.creator.provision_container('base', fake_reservation)
         # Mock Assertions
         self.mock_file_assembler.setup.assert_called_with(
+                self.mock_settings,
                 self.mock_lxc_service.create.return_value,
                 fake_reservation)
 
-
         # Assert return value
         assert container == self.mock_app_container_cls.create.return_value
-
-        

@@ -10,6 +10,8 @@ class AppContainerCreator(object):
     def provision_container(self, base, reservation):
         """Provisions a brand new container
         
+        :param base: An identifier for the base that we'd like to use
+        :param type: str
         :param reservation: A ResourceReservation object that describes
             a container's resources
         """
@@ -23,7 +25,7 @@ class AppContainerCreator(object):
         lxc = self._create_lxc(reservation.name, base, overlays)
 
         # Setup the files in the LXC
-        self._file_assembler.setup(lxc, reservation)
+        self._file_assembler.setup(settings, lxc, reservation)
 
         # Create and return an app container for the LXC and it's reservations
         return app_container_cls.create(base, lxc, reservation)
