@@ -1,3 +1,6 @@
+import os
+
+
 class AppContainerCreator(object):
     """Coordinates the creation of a new AppContainer"""
     def __init__(self, settings, app_container_cls, 
@@ -38,3 +41,45 @@ class AppContainerCreator(object):
     def _create_lxc(self, name, base, overlays):
         """Creates the LXC object from the given name and overlays"""
         return self._lxc_service.create(name, base=base, overlays=overlays)
+
+
+class FileAssembler(object):
+    def setup(self, settings, lxc, reservation):
+        skeleton_path = settings.skeletons_path('base')
+        lxc_path = lxc.path()
+        writer = LXCSkeletonWriter(skeleton_path, lxc_path)
+        # Walk the directory
+        for root, dir_names, filenames in os.walk(skeleton_path):
+            # Current relative path
+            relative_root = os.path.relpath(root, skeleton_path)
+            # Create directories
+            for dir_name in dir_names:
+                dir_path = os.path.join(relative_root, dir_name)
+                writer.make_dir(dir_path)
+            for filename in filenames:
+                file_path = os.path.join(relative_root, filename)
+                # If the file has '.tmpl' as an extension then run it
+                # through the template renderer
+                if filename.endswith('.tmpl'):
+                    writer.render(file_path, lxc=lxc, settings=settings,
+                            reservation=reservation)
+                # Otherwise
+                else:
+                    # Copy the file
+                    writer.copy(file_path)
+
+
+class LXCSkeletonWriter(object):
+    """Manages the writing of skeleton files to an LXC"""
+    def __init__(self, skeleton_path, lxc_path):
+        self.base_dir = skeleton_path
+        self.lxc_path = lxc_path
+
+    def render(self, path, **context):
+        pass
+
+    def copy(self, path):
+        pass
+
+    def make_dir(self, path):
+        pass
