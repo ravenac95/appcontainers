@@ -2,6 +2,7 @@ from mock import Mock, patch, call
 from appcontainers.creator import *
 from tests.fakes import *
 
+
 class TestAppContainerCreator(object):
     def setup(self):
         mock_settings = Mock()
@@ -9,7 +10,7 @@ class TestAppContainerCreator(object):
         mock_lxc_service = Mock()
         mock_file_assembler = Mock()
 
-        creator = AppContainerCreator(mock_settings, 
+        creator = AppContainerCreator(mock_settings,
                 app_container_cls=mock_app_container_cls,
                 lxc_service=mock_lxc_service,
                 file_assembler=mock_file_assembler)
@@ -19,9 +20,9 @@ class TestAppContainerCreator(object):
         self.mock_app_container_cls = mock_app_container_cls
         self.mock_lxc_service = mock_lxc_service
         self.mock_file_assembler = mock_file_assembler
-    
+
     def test_app_container_creator_provision_container(self):
-        fake_reservation = FakeResourceReservation.create('somename', 
+        fake_reservation = FakeResourceReservation.create('somename',
                 '192.168.0.1', '00:16:3e:00:00:00')
         container = self.creator.provision_container('base', fake_reservation)
         # Mock Assertions
@@ -33,8 +34,10 @@ class TestAppContainerCreator(object):
         # Assert return value
         assert container == self.mock_app_container_cls.create.return_value
 
+
 def test_initialize_file_assembler():
     FileAssembler()
+
 
 class TestFileAssembler(object):
     def setup(self):
@@ -47,7 +50,7 @@ class TestFileAssembler(object):
         mock_settings = Mock()
         mock_lxc = Mock()
         mock_reservation = Mock()
-        
+
         # Setup Writer
         mock_writer = mock_writer_cls.return_value
 
@@ -79,7 +82,7 @@ class TestFileAssembler(object):
             call('somedir/hello/world'),
         ]
         mock_writer.copy.assert_has_calls(expected_copy_calls, any_order=True)
-        
+
         #### LXCSkeletonWriter.make_dir assertions
         expected_ensure_dir_calls = [
             call('somedir/hello'),
