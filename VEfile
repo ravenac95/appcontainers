@@ -1,5 +1,6 @@
 requirements:
   - ipaddr
+  - tempita
 
 ---
 profile: development

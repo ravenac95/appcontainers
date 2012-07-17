@@ -1,4 +1,5 @@
 ipaddr (ipaddr==2.1.10)
+tempita (Tempita==0.5.1)
 nose (nose==1.1.2)
 testkit (testkit==0.1.2)
   fudge (fudge==1.0.3)

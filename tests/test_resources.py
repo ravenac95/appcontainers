@@ -23,7 +23,7 @@ class TestResourceService(object):
         reservation_cls = Mock()
         resource_repository = fake_resource_reservation_repository_setup()
 
-        self.service = ResourceService(resource_repository, settings,
+        self.service = ResourceService(settings, resource_repository,
                 reservation_cls=reservation_cls)
 
         self.mock_settings = settings
@@ -150,7 +150,7 @@ def test_resource_service_making_resources():
     settings = FakeSettings(network=ipaddr.IPv4Network('192.168.0.0/24'),
             mac_range=['00:16:3e:00:00:00', '00:16:3e:00:01:00'])
 
-    service = ResourceService(resource_repository, settings, 
+    service = ResourceService(settings, resource_repository,
             reservation_cls=reservation_cls)
 
     reservation = service.make_reservation()

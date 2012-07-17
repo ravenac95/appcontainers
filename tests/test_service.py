@@ -14,11 +14,12 @@ class TestAppContainerService(object):
 
     def test_service_provision(self):
         # Run Test
-        self.service.provision()
+        base = 'abase'
+        self.service.provision(base=base)
         
         # Assertions
         self.mock_resource_service.make_reservation.assert_called_with()
-        self.mock_creator.provision_container.assert_called_with(
+        self.mock_creator.provision_container.assert_called_with(base,
                 self.mock_resource_service.make_reservation.return_value)
 
     def test_service_service_path(self):

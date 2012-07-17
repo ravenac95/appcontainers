@@ -1,5 +1,6 @@
 import uuid
 import ipaddr
+from .models import ResourceReservation
 
 
 class ResourcesUnavailable(Exception):
@@ -10,8 +11,12 @@ class Unavailable(Exception):
     pass
 
 
+def setup_resource_service(settings, repository, reservation_cls=None):
+    reservation_cls = reservation_cls or ResourceReservation
+    return ResourceService(settings, repository, reservation_cls)
+
 class ResourceService(object):
-    def __init__(self, repository, settings, reservation_cls=None):
+    def __init__(self, settings, repository, reservation_cls=None):
         self._repository = repository
         self._settings = settings
         self._reservation_cls = reservation_cls

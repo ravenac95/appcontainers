@@ -7,7 +7,10 @@ def create_app_container_object():
 # Process for creating an app container
 #
 # Provision container with overlays
-# Add files to container
+#  - Create overlay directory
+#  - Mount overlay
+#  - Setup skeleton files for this container instance
+# Add app files to container
 # Run build command in container
 # Squash the container's raw overlay and save into the user images
 # Clean the raw overlay
@@ -24,7 +27,7 @@ class AppContainerService(object):
         """Provision a new app container using the default base"""
         # Setup the information for the container
         resource_reservation = self._resource_service.make_reservation()
-        return self._creator.provision_container(resource_reservation)
+        return self._creator.provision_container(base, resource_reservation)
 
     def service_path(self, *join_paths):
         return os.path.join(self._base_path, *join_paths)

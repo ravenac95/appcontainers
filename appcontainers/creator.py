@@ -1,15 +1,24 @@
 import os
 import tempita
 import shutil
+from .models import AppContainer
 
 TEMPLATE_EXTENSION = '.tmpl'
 TEMPLATE_EXTENSION_LENGTH = len(TEMPLATE_EXTENSION)
 
+def setup_app_container_creator(settings, lxc_service, 
+        app_container_cls=None, file_assembler=None):
+    file_assembler = file_assembler or FileAssembler()
+    app_container_cls = app_container_cls or AppContainer
+    return AppContainerCreator(settings, lxc_service, 
+            file_assembler=file_assembler,
+            app_container_cls=app_container_cls)
+
 
 class AppContainerCreator(object):
     """Coordinates the creation of a new AppContainer"""
-    def __init__(self, settings, app_container_cls, 
-            lxc_service, file_assembler):
+    def __init__(self, settings, lxc_service,
+            file_assembler, app_container_cls):
         self._settings = settings
         self._app_container_cls = app_container_cls
         self._lxc_service = lxc_service
@@ -77,8 +86,8 @@ class FileAssembler(object):
 class LXCSkeletonWriter(object):
     """Manages the writing of skeleton files and directory to an LXC"""
     def __init__(self, skeleton_base_path, lxc_base_path):
-        self._skeleton_base_path = skeleton_path
-        self._lxc_base_path = lxc_path
+        self._skeleton_base_path = skeleton_base_path
+        self._lxc_base_path = lxc_base_path
 
     def _generate_path_pair(self, path, remove_lxc_right=0):
         """Generates a path pair for the skeleton and lxc path
