@@ -25,7 +25,7 @@ class SkeletonAssembler(object):
                 # If the file has '.tmpl' as an extension then run it
                 # through the template renderer
                 if filename.endswith(TEMPLATE_EXTENSION):
-                    writer.render(file_path, lxc=lxc, settings=settings,
+                    writer.render(file_path, ext_length=TEMPLATE_EXTENSION_LENGTH, 
                             reservation=reservation)
                 # Otherwise
                 else:

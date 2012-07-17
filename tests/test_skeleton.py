@@ -1,5 +1,9 @@
-from mock import Mock, patch, call
+import filecmp
+from mock import Mock, patch, call, ANY
+from nose.plugins.attrib import attr
+from testkit import temp_directory
 from appcontainers.skeleton import *
+from tests import fixtures_path
 from tests.fakes import *
 
 
@@ -36,8 +40,7 @@ class TestSkeletonAssembler(object):
         #### SkeletonWriter.render assertions
 
         # Expected render calls
-        common_kwargs = dict(lxc=mock_lxc, settings=mock_settings,
-                reservation=mock_reservation)
+        common_kwargs = dict(ext_length=ANY, reservation=mock_reservation)
         expected_render_calls = [
             call('somedir/one.sh.tmpl', **common_kwargs),
             call('somedir/hello/hello.tmpl', **common_kwargs),
@@ -100,3 +103,31 @@ class TestSkeletonWriter(object):
     def test_ensure_dir_with_os_error(self, mock_mkdir):
         mock_mkdir.side_effect = OSError()
         self.writer.ensure_dir('hellodir')
+
+@attr('medium')
+class TestSkeletonAssemblerWithFixtures(object):
+    """Test the SkeletonWriter with Fixture1 data"""
+    def test_with_skeleton1_fixture(self):
+        skeleton1_input = fixtures_path('skeleton1/input')
+        skeleton1_expected = fixtures_path('skeleton1/expected')
+        with temp_directory() as temp_dir:
+            # Setup fake settings
+            mock_settings = Mock()
+            mock_settings.skeletons_path.return_value = skeleton1_input
+
+            # Setup fake LXC
+            mock_lxc = Mock()
+            mock_lxc.path.return_value = temp_dir
+
+            # Fake Reservation
+            fake_reservation = FakeResourceReservation('SOMENAME', 
+                    '192.168.0.1', '00:16:3e:00:00:01')
+
+            assembler = SkeletonAssembler()
+            assembler.setup(mock_settings, mock_lxc, fake_reservation)
+
+            comparison = filecmp.dircmp(temp_dir, skeleton1_expected)
+            
+            assert len(comparison.diff_files) == 0
+            assert len(comparison.right_only) == 0
+            assert len(comparison.left_only) == 0
