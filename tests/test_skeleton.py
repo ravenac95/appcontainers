@@ -106,28 +106,55 @@ class TestSkeletonWriter(object):
 
 @attr('medium')
 class TestSkeletonAssemblerWithFixtures(object):
-    """Test the SkeletonWriter with Fixture1 data"""
+    """Test the SkeletonWriter with Fixture data"""
+    def setup_skeleton1(self, temp_dir, skeleton1_input):
+        # Setup fake settings
+        mock_settings = Mock()
+        mock_settings.skeletons_path.return_value = skeleton1_input
+
+        # Setup fake LXC
+        mock_lxc = Mock()
+        mock_lxc.path.return_value = temp_dir
+
+        # Fake Reservation
+        fake_reservation = FakeResourceReservation('SOMENAME', 
+                '192.168.0.1', '00:16:3e:00:00:01')
+
+        return (mock_settings, mock_lxc, fake_reservation)
+
+    def assert_identical_dirs(self, test_dir, expected_dir, message=None):
+        comparison = filecmp.dircmp(test_dir, expected_dir)
+
+        if (comparison.diff_files or comparison.right_only 
+                or comparison.left_only):
+            raise AssertionError('Directories do not match')
+    
     def test_with_skeleton1_fixture(self):
         skeleton1_input = fixtures_path('skeleton1/input')
         skeleton1_expected = fixtures_path('skeleton1/expected')
         with temp_directory() as temp_dir:
-            # Setup fake settings
-            mock_settings = Mock()
-            mock_settings.skeletons_path.return_value = skeleton1_input
-
-            # Setup fake LXC
-            mock_lxc = Mock()
-            mock_lxc.path.return_value = temp_dir
-
-            # Fake Reservation
-            fake_reservation = FakeResourceReservation('SOMENAME', 
-                    '192.168.0.1', '00:16:3e:00:00:01')
+            setup_args = self.setup_skeleton1(temp_dir, skeleton1_input)
 
             assembler = SkeletonAssembler()
-            assembler.setup(mock_settings, mock_lxc, fake_reservation)
+            assembler.setup(*setup_args)
 
-            comparison = filecmp.dircmp(temp_dir, skeleton1_expected)
-            
-            assert len(comparison.diff_files) == 0
-            assert len(comparison.right_only) == 0
-            assert len(comparison.left_only) == 0
+            self.assert_identical_dirs(temp_dir, skeleton1_expected)
+
+
+    def test_with_skeleton1_fixture_write_multiple_times(self):
+        """Test that the assembler can be run multiple times and produce the
+        same result
+        """
+        skeleton1_input = fixtures_path('skeleton1/input')
+        skeleton1_expected = fixtures_path('skeleton1/expected')
+        with temp_directory() as temp_dir:
+            setup_args = self.setup_skeleton1(temp_dir, skeleton1_input)
+
+            assembler = SkeletonAssembler()
+
+            # Run multiple times
+            assembler.setup(*setup_args)
+            assembler.setup(*setup_args)
+            assembler.setup(*setup_args)
+
+            self.assert_identical_dirs(temp_dir, skeleton1_expected)
