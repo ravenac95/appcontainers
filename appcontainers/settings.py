@@ -2,6 +2,7 @@ import os
 import ipaddr
 import constants
 
+
 class Settings(object):
     def __init__(self, base_path, network, mac_range):
         self._base_path = os.path.abspath(base_path)

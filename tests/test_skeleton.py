@@ -104,6 +104,7 @@ class TestSkeletonWriter(object):
         mock_mkdir.side_effect = OSError()
         self.writer.ensure_dir('hellodir')
 
+
 @attr('medium')
 class TestSkeletonAssemblerWithFixtures(object):
     """Test the SkeletonWriter with Fixture data"""
@@ -139,7 +140,6 @@ class TestSkeletonAssemblerWithFixtures(object):
             assembler.setup(*setup_args)
 
             self.assert_identical_dirs(temp_dir, skeleton1_expected)
-
 
     def test_with_skeleton1_fixture_write_multiple_times(self):
         """Test that the assembler can be run multiple times and produce the
