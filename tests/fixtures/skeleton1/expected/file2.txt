@@ -1,0 +1,7 @@
+This file uses a template. The data in here will change. Here's the information
+on the resource reservation from appcontainers:
+
+ResourceReservation:
+    - name: SOMENAME
+    - ip: 192.168.0.1
+    - mac: 00:16:3e:00:00:01
