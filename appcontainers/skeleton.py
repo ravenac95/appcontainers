@@ -34,12 +34,12 @@ class SkeletonAssembler(object):
 
 
 class SkeletonWriter(object):
-    """Manages the writing of skeleton files and directory to an LXC"""
+    """Handles writing of skeleton files and directories to an LXC"""
     def __init__(self, skeleton_base_path, lxc_base_path):
         self._skeleton_base_path = skeleton_base_path
         self._lxc_base_path = lxc_base_path
 
-    def _generate_path_pair(self, path, remove_lxc_right=0):
+    def generate_path_pair(self, path, remove_lxc_right=0):
         """Generates a path pair for the skeleton and lxc path
 
         :param path: a relative path for use in both skeleton and lxc
@@ -49,19 +49,22 @@ class SkeletonWriter(object):
         :type remove_lxc_right: int
         """
         skeleton_path = os.path.join(self._skeleton_base_path, path)
-        lxc_path = os.path.join(self._lxc_base_path, path[:-remove_lxc_right])
+        adjusted_path = path
+        if remove_lxc_right != 0:
+            adjusted_path = path[:-remove_lxc_right]
+        lxc_path = os.path.join(self._lxc_base_path, adjusted_path)
 
         return (skeleton_path, lxc_path)
 
-    def render(self, path, **context):
+    def render(self, path, ext_length=0, **context):
         """Render a template in the skeleton into the LXC
         
         :param path: a relative path for use in both skeleton and lxc
         :type path: str
         :param context: the context for the templates
         """
-        skeleton_file_path, lxc_file_path = self._generate_path_pair(path,
-                TEMPLATE_EXTENSION_LENGTH)
+        skeleton_file_path, lxc_file_path = self.generate_path_pair(path,
+                ext_length)
 
         template = tempita.Template.from_filename(skeleton_file_path)
 
@@ -77,7 +80,7 @@ class SkeletonWriter(object):
         :param path: a relative path for use in both skeleton and lxc
         :type path: str
         """
-        skeleton_file_path, lxc_file_path = self._generate_path_pair(path)
+        skeleton_file_path, lxc_file_path = self.generate_path_pair(path)
         shutil.copy(skeleton_file_path, lxc_file_path)
 
     def ensure_dir(self, path):
@@ -86,7 +89,7 @@ class SkeletonWriter(object):
         :param path: a relative path for use in both skeleton and lxc
         :type path: str
         """
-        skeleton_dir_path, lxc_dir_path = self._generate_path_pair(path)
+        skeleton_dir_path, lxc_dir_path = self.generate_path_pair(path)
         try:
             os.mkdir(lxc_dir_path)
         except OSError:
