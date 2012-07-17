@@ -11,7 +11,7 @@ class TestSkeletonAssembler(object):
     def setup(self):
         self.assembler = SkeletonAssembler()
 
-    @patch('appcontainers.skeleton.LXCSkeletonWriter', autospec=True)
+    @patch('appcontainers.skeleton.SkeletonWriter', autospec=True)
     @patch('os.walk')
     def test_setup(self, mock_walk, mock_writer_cls):
         # FIXME this is a c/mplicated test :-/

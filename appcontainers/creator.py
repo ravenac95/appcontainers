@@ -1,6 +1,6 @@
 import os
 from .models import AppContainer
-from .skeleton import LXCSkeletonWriter
+from .skeleton import SkeletonWriter, SkeletonAssembler
 
 
 def setup_app_container_creator(settings, lxc_service,

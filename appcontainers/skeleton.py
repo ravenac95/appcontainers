@@ -7,10 +7,11 @@ TEMPLATE_EXTENSION_LENGTH = len(TEMPLATE_EXTENSION)
 
 
 class SkeletonAssembler(object):
+    """Directs the SkeletonWriter"""
     def setup(self, settings, lxc, reservation):
         skeleton_path = settings.skeletons_path('base')
         lxc_path = lxc.path()
-        writer = LXCSkeletonWriter(skeleton_path, lxc_path)
+        writer = SkeletonWriter(skeleton_path, lxc_path)
         # Walk the directory
         for root, dir_names, filenames in os.walk(skeleton_path):
             # Current relative path
@@ -32,7 +33,7 @@ class SkeletonAssembler(object):
                     writer.copy(file_path)
 
 
-class LXCSkeletonWriter(object):
+class SkeletonWriter(object):
     """Manages the writing of skeleton files and directory to an LXC"""
     def __init__(self, skeleton_base_path, lxc_base_path):
         self._skeleton_base_path = skeleton_base_path
