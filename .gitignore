@@ -45,6 +45,8 @@ downloads
 eggs
 parts
 dist
+.coverage
+cover
 
 #virtstrap (old version)
 quickactivate.sh
