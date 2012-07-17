@@ -105,7 +105,12 @@ class LXCSkeletonWriter(object):
         return (skeleton_path, lxc_path)
 
     def render(self, path, **context):
-        """Render a template in the skeleton into the LXC"""
+        """Render a template in the skeleton into the LXC
+        
+        :param path: a relative path for use in both skeleton and lxc
+        :type path: str
+        :param context: the context for the templates
+        """
         skeleton_file_path, lxc_file_path = self._generate_path_pair(path,
                 TEMPLATE_EXTENSION_LENGTH)
 
@@ -118,12 +123,20 @@ class LXCSkeletonWriter(object):
         lxc_file.close()
 
     def copy(self, path):
-        """Copy file from skeleton to lxc"""
+        """Copy file from skeleton to lxc
+        
+        :param path: a relative path for use in both skeleton and lxc
+        :type path: str
+        """
         skeleton_file_path, lxc_file_path = self._generate_path_pair(path)
         shutil.copy(skeleton_file_path, lxc_file_path)
 
     def ensure_dir(self, path):
-        """Ensure a directory that exists in the skeleton exists in the LXC"""
+        """Ensure a directory that exists in the skeleton exists in the LXC
+        
+        :param path: a relative path for use in both skeleton and lxc
+        :type path: str
+        """
         skeleton_dir_path, lxc_dir_path = self._generate_path_pair(path)
         try:
             os.mkdir(lxc_dir_path)
