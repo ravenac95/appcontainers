@@ -6,11 +6,12 @@ from .models import AppContainer
 TEMPLATE_EXTENSION = '.tmpl'
 TEMPLATE_EXTENSION_LENGTH = len(TEMPLATE_EXTENSION)
 
-def setup_app_container_creator(settings, lxc_service, 
+
+def setup_app_container_creator(settings, lxc_service,
         app_container_cls=None, file_assembler=None):
     file_assembler = file_assembler or FileAssembler()
     app_container_cls = app_container_cls or AppContainer
-    return AppContainerCreator(settings, lxc_service, 
+    return AppContainerCreator(settings, lxc_service,
             file_assembler=file_assembler,
             app_container_cls=app_container_cls)
 
@@ -26,7 +27,7 @@ class AppContainerCreator(object):
 
     def provision_container(self, base, reservation):
         """Provisions a brand new container
-        
+
         :param base: An identifier for the base that we'd like to use
         :type base: str
         :param reservation: A ResourceReservation object that describes
@@ -94,7 +95,7 @@ class LXCSkeletonWriter(object):
 
         :param path: a relative path for use in both skeleton and lxc
         :type path: str
-        :param remove_lxc_right: characters to remove from the right on the lxc 
+        :param remove_lxc_right: characters to remove from the right on the lxc
             path
         :type remove_lxc_right: int
         """
@@ -105,7 +106,7 @@ class LXCSkeletonWriter(object):
 
     def render(self, path, **context):
         """Render a template in the skeleton into the LXC"""
-        skeleton_file_path, lxc_file_path = self._generate_path_pair(path, 
+        skeleton_file_path, lxc_file_path = self._generate_path_pair(path,
                 TEMPLATE_EXTENSION_LENGTH)
 
         template = tempita.Template.from_filename(skeleton_file_path)
