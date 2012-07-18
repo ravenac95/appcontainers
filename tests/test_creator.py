@@ -1,4 +1,4 @@
-from mock import Mock
+from mock import Mock, patch
 from appcontainers.creator import *
 from tests.fakes import *
 
@@ -21,7 +21,8 @@ class TestAppContainerCreator(object):
         self.mock_lxc_service = mock_lxc_service
         self.mock_skeleton_assembler = mock_skeleton_assembler
 
-    def test_app_container_creator_provision_container(self):
+    @patch('os.mkdir')
+    def test_app_container_creator_provision_container(self, mock_mkdir):
         fake_reservation = FakeResourceReservation.create('somename',
                 '192.168.0.1', '00:16:3e:00:00:00')
         container = self.creator.provision_container('base', fake_reservation)
@@ -30,6 +31,9 @@ class TestAppContainerCreator(object):
                 self.mock_settings,
                 self.mock_lxc_service.create.return_value,
                 fake_reservation)
+
+        mock_mkdir.assert_called_with(
+                self.mock_settings.overlays_path.return_value)
 
         # Assert return value
         assert container == self.mock_app_container_cls.create.return_value

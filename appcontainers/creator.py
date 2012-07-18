@@ -47,6 +47,8 @@ class AppContainerCreator(object):
     def _create_overlay_directories(self, name):
         """Creates overlay directories"""
         top_overlay = self._settings.overlays_path(name)
+        # Make the directory
+        os.mkdir(top_overlay)
         return [top_overlay]
 
     def _create_lxc(self, name, base, overlays):
