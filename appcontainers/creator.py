@@ -42,7 +42,7 @@ class AppContainerCreator(object):
         self._skeleton_assembler.setup(settings, lxc, reservation)
 
         # Create and return an app container for the LXC and it's reservations
-        return app_container_cls.create(base, lxc, reservation)
+        return app_container_cls.create(base, lxc, reservation, overlays)
 
     def _create_overlay_directories(self, name):
         """Creates overlay directories"""
