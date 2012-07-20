@@ -39,10 +39,11 @@ default::
     - /var/lib/appcontainers/ - Root of appcontainers data
         - images/
             - bases/ - Base images
-            - user/ - User loaded images
-        - overlays/ - Stores overlay mounts / file systems here
+            - container/ - Container Images
+                - library/ - Storage of .aimg files
+                - mount/ - Mount points for .aimg files
+        - overlays/ - Stores overlay/tmpfs file systems here
             - tmp/ - Temporary overlays
-            - image/ - Image overlays
             - raw/ - Raw overlays (this is not mounted nor squashed)
         - resources.json - Current state of the network resources
         - skeletons/ - Skeleton files for use in starting, provisioning, or
