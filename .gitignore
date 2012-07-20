@@ -45,8 +45,13 @@ downloads
 eggs
 parts
 dist
+
+# Coverage
 .coverage
 cover
+
+# Rope 
+.ropeproject
 
 #virtstrap (old version)
 quickactivate.sh
