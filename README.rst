@@ -36,11 +36,11 @@ Directory Locations
 appcontainers stores information about the LXC's in the following locations by
 default::
 
-    - /var/lib/appcontainers/ - Root of appcontainers data
+    - /var/lib/appcontainers/ - Root of appcontainers data (DEFAULT DIRECTORY)
         - images/
             - bases/ - Base images
             - container/ - Container Images
-                - library/ - Storage of .aimg files
+                - lib/ - Storage of .aimg files
                 - mount/ - Mount points for .aimg files
         - overlays/ - Stores overlay/tmpfs file systems here
             - tmp/ - Temporary overlays

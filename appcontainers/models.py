@@ -24,6 +24,10 @@ class AppContainer(SignalsMixin):
         self._reservation = reservation
         self._directory_list = directory_list
 
+    @property
+    def name(self):
+        return self._reservation.name
+
     def start(self):
         self.lxc.start()
 
