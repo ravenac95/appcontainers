@@ -1,4 +1,4 @@
-from mock import Mock, ANY
+from mock import Mock, MagicMock, ANY
 from appcontainers.models import *
 
 
@@ -11,7 +11,7 @@ class TestAppContainer(object):
     def setup(self):
         self.mock_lxc = Mock()
         self.mock_reservation = Mock()
-        self.mock_directory_list = Mock()
+        self.mock_directory_list = MagicMock()
         self.container = AppContainer.create('base', self.mock_lxc,
                 self.mock_reservation, self.mock_directory_list)
 
@@ -38,3 +38,11 @@ class TestAppContainer(object):
         self.container.destroy()
 
         mock_listener.assert_called_with(ANY, self.container)
+
+    def test_make_image(self):
+        mock_writer = Mock()
+
+        self.container.make_image('path', mock_writer)
+
+        mock_writer.create.assert_called_with('path', 'base',
+                self.mock_directory_list[-1])

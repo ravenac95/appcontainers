@@ -40,6 +40,9 @@ class AppContainer(SignalsMixin):
         # Fire destroy event
         self.publish_signal('destroyed')
 
+    def make_image(self, path, writer):
+        writer.create(path, self._base, self._directory_list[-1])
+
 
 class ResourceReservation(object):
     @classmethod
