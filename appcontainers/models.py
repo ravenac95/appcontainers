@@ -1,19 +1,28 @@
-
-class DirectoryManager():
-    pass
+from .signals import SignalsMixin
 
 
-class AppContainer(object):
+class AppContainer(SignalsMixin):
     @classmethod
-    def create(cls, base, lxc, reservation, directories):
-        directory_manager = DirectoryManager.new(directories)
-        return cls(base, lxc, reservation)
+    def create(cls, base, lxc, reservation, directory_list):
+        """Creates a new app container
 
-    def __init__(self, base, lxc, reservation, directory_manager):
+        :param base: identifier for the base
+        :type base: str
+        :param lxc: This app container's associated LXC
+        :type lxc: LXC
+        :param reservation: this AppContainer's ResourceReservation
+        :type reservation: ResourceReservation
+        :param directory_list: A DirectoryList that manages this container's
+            directories
+        :type directory_list: DirectoryList
+        """
+        return cls(base, lxc, reservation, directory_list)
+
+    def __init__(self, base, lxc, reservation, directory_list):
         self._base = base
         self.lxc = lxc
         self._reservation = reservation
-        self._directories = directories
+        self._directory_list = directory_list
 
     def start(self):
         self.lxc.start()
@@ -25,7 +34,11 @@ class AppContainer(object):
         # Destroy LXC
         self.lxc.destroy()
 
-        # Destroy AppContainer's storage
+        # Destroy AppContainer's directories
+        self._directory_list.destroy()
+
+        # Fire destroy event
+        self.publish_signal('destroyed')
 
 
 class ResourceReservation(object):
