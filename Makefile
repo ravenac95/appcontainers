@@ -1,3 +1,6 @@
+develop:
+	vstrap init
+
 # Run all tests
 test:
 	nosetests -d
