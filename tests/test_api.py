@@ -1,5 +1,5 @@
 from nose.plugins.attrib import attr
-from appcontainers.models import *
+from appcontainers.service import *
 import appcontainers
 from .utils import only_as_root
 
@@ -9,14 +9,18 @@ class TestAppContainersAPI(object):
     @only_as_root
     def test_provision_a_container(self):
         service = appcontainers.setup_service()
+        destroyed = False
         try:
             container = service.provision()
-            lxc = container.lxc
-            assert isinstance(container, AppContainer) == True
+            # Grab the contained LXC as a fail-safe
+            lxc = container._container.lxc
+            assert isinstance(container, ManagedAppContainer) == True
 
             container.destroy()
+            destroyed = True
         finally:
-            try:
-                lxc.destroy()
-            except:
-                pass
+            if destroyed:
+                try:
+                    lxc.destroy()
+                except:
+                    pass
