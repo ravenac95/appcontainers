@@ -1,9 +1,6 @@
-from .signals import SignalsMixin
-
-
-class AppContainer(SignalsMixin):
+class AppContainer(object):
     @classmethod
-    def create(cls, base, lxc, reservation, directory_list):
+    def create(cls, ancestor_info, lxc, reservation):
         """Creates a new app container
 
         :param base: identifier for the base
@@ -16,17 +13,20 @@ class AppContainer(SignalsMixin):
             directories
         :type directory_list: DirectoryList
         """
-        return cls(base, lxc, reservation, directory_list)
+        return cls(ancestor_info, lxc, reservation)
 
-    def __init__(self, base, lxc, reservation, directory_list):
-        self._base = base
+    def __init__(self, ancestor_info, lxc, reservation):
+        self._ancestor_info = ancestor_info
         self.lxc = lxc
         self._reservation = reservation
-        self._directory_list = directory_list
 
     @property
     def name(self):
         return self._reservation.name
+
+    @property
+    def ancestor_info(self):
+        return self._ancestor_info
 
     def start(self):
         self.lxc.start()
@@ -38,14 +38,8 @@ class AppContainer(SignalsMixin):
         # Destroy LXC
         self.lxc.destroy()
 
-        # Destroy AppContainer's directories
-        self._directory_list.destroy()
-
-        # Fire destroy event
-        self.publish_signal('destroyed')
-
-    def make_image(self, path, writer):
-        writer.create(path, self._base, self._directory_list[-1])
+    def __repr__(self):
+        return '<AppContainer [%s]>' % self.name
 
 
 class ResourceReservation(object):
