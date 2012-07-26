@@ -59,5 +59,5 @@ class ResourceReservation(object):
         self.mac = mac
 
     def __repr__(self):
-        return "<ResourceReservation [%s, %s, %s]>" % (self.name, self.ip,
-                self.mac)
+        return "<ResourceReservation [%s, %s, %s]>" % (self.name,
+                self.ip, self.mac)

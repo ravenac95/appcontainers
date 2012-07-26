@@ -1,5 +1,6 @@
 import ipaddr
 
+
 class FakeResourceReservation(object):
     @classmethod
     def create(cls, name, ip, mac):
@@ -11,9 +12,10 @@ class FakeResourceReservation(object):
         self.ip = ip
         self.mac = mac
 
+
 class FakeResourceReservationRepository(object):
-    """A fake implementation of the ResourceRepository 
-    
+    """A fake implementation of the ResourceRepository
+
     It uses a dictionary to store the data.
     """
     def __init__(self, *args, **kwargs):

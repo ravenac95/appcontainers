@@ -1,6 +1,7 @@
 requirements:
   - ipaddr
   - tempita
+  - ZODB3
 
 ---
 profile: development

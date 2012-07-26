@@ -1,6 +1,7 @@
 import uuid
 import ipaddr
 from .models import ResourceReservation
+from .repository import Repository
 
 
 class ResourcesUnavailable(Exception):
@@ -14,6 +15,7 @@ class Unavailable(Exception):
 def setup_resource_service(settings, repository, reservation_cls=None):
     reservation_cls = reservation_cls or ResourceReservation
     return ResourceService(settings, repository, reservation_cls)
+
 
 class ResourceService(object):
     def __init__(self, settings, repository, reservation_cls=None):
@@ -40,6 +42,39 @@ class ResourceService(object):
         reservation = self._reservation_cls.create(name, ip, mac)
         self._repository.save(reservation)
         return reservation
+
+
+class ResourceReservationRepository(Repository):
+    def all(self):
+        """Returns a list of all resources"""
+        reservations = self._reservations
+        return reservations.items()
+
+    def find_by_name(self, name):
+        reservation = self._reservations.get(name)
+        if not reservation
+            raise self.DoesNotExist('ResourceReservation "%s" does not exist'
+                % name)
+        return reservation
+
+    def save(self, reservation):
+        reservations = self._reservations
+        reservations[reservation.name] = dict(
+            name=reservation.name,
+            ip=reservation.ip,
+            mac=reservation.mac,
+        )
+
+    @property
+    def _reservations(self):
+        return self._database.root['resource_reservations']
+
+    def _load(self, raw_data):
+        return ResourceReservation.create(raw_data['name'],
+                raw_data['ip'], raw_data['mac'])
+
+    class DoesNotExist(object):
+        pass
 
 
 def available_name(used_names):
@@ -91,5 +126,5 @@ def mac_int_to_str(mac_int):
     leading_str = '0' * (12 - len(mac_str))
     mac_str = '%s%s' % (leading_str, mac_str)
 
-    split_str = [mac_str[i:i+2] for i in range(0, len(mac_str), 2)]
+    split_str = [mac_str[i:i + 2] for i in range(0, len(mac_str), 2)]
     return ':'.join(split_str)
