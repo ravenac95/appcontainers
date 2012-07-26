@@ -9,7 +9,6 @@ from .service import AppContainerService
 from .resources import setup_resource_service
 from .creator import setup_app_container_creator
 from .settings import Settings
-        
 
 
 def setup_service():
@@ -22,8 +21,9 @@ def setup_service():
 
 
 def _create_settings(**kwargs):
+    # FIXME FAKED
     import ipaddr
-    settings = Settings(base_path='/var/lib/appcontainers', 
+    settings = Settings(base_path='/var/lib/appcontainers',
             network=ipaddr.IPv4Network('192.168.0.0/24'),
             mac_range=['00:16:3e:00:00:00', '00:16:3e:00:01:00'])
     return settings
@@ -31,6 +31,7 @@ def _create_settings(**kwargs):
 
 def _create_resource_repository():
     """Creates a resource repository"""
+    # FIXME FAKED
     from tests.fakes import FakeResourceReservationRepository
     resource_repository = FakeResourceReservationRepository()
     resource_repository._setup_resources([
