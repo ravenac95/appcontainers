@@ -45,7 +45,7 @@ default::
         - overlays/ - Stores overlay/tmpfs file systems here
             - tmp/ - Temporary overlays
             - raw/ - Raw overlays (this is not mounted nor squashed)
-        - resources.json - Current state of the network resources
+        - db/ - Database files for appcontainers
         - skeletons/ - Skeleton files for use in starting, provisioning, or
             loading containers. Tempita templates can be used here and the
             reservation object will be passed into the context
@@ -78,7 +78,7 @@ Create a new app container and load code into container's home directory::
     # ...
 
     # Once complete. Save to an image
-    new_container.save_image('path_to_destination.aimg')
+    service.save_image(new_container, name="some-image-name")
 
 Load an app image::
     
