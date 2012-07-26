@@ -25,7 +25,8 @@ class SkeletonAssembler(object):
                 # If the file has '.tmpl' as an extension then run it
                 # through the template renderer
                 if filename.endswith(TEMPLATE_EXTENSION):
-                    writer.render(file_path, ext_length=TEMPLATE_EXTENSION_LENGTH, 
+                    writer.render(file_path,
+                            ext_length=TEMPLATE_EXTENSION_LENGTH,
                             reservation=reservation)
                 # Otherwise
                 else:
@@ -58,7 +59,7 @@ class SkeletonWriter(object):
 
     def render(self, path, ext_length=0, **context):
         """Render a template in the skeleton into the LXC
-        
+
         :param path: a relative path for use in both skeleton and lxc
         :type path: str
         :param context: the context for the templates
@@ -76,7 +77,7 @@ class SkeletonWriter(object):
 
     def copy(self, path):
         """Copy file from skeleton to lxc
-        
+
         :param path: a relative path for use in both skeleton and lxc
         :type path: str
         """
@@ -85,7 +86,7 @@ class SkeletonWriter(object):
 
     def ensure_dir(self, path):
         """Ensure a directory that exists in the skeleton exists in the LXC
-        
+
         :param path: a relative path for use in both skeleton and lxc
         :type path: str
         """
