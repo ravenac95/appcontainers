@@ -23,3 +23,5 @@ IMAGES_USER_DIR = 'container'
 SKELETONS_DIR = 'skeletons'
 
 IMAGE_FILE_EXTENSION = 'aimg'
+
+DATABASE_NAME = 'db/state.zdb'
