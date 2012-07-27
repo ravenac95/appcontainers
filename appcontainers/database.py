@@ -1,4 +1,11 @@
 from ZODB import FileStorage, DB
+import transaction
+
+
+class Session(object):
+    """Wrapper for the transaction"""
+    def commit(self):
+        transaction.commit()
 
 
 class LocalDatabase(object):
