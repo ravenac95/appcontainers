@@ -11,7 +11,7 @@ class Settings(object):
 
     def base_path(self, *join_paths):
         return os.path.join(self._base_path, *join_paths)
-    
+
     def overlays_path(self, *join_paths):
         return self.base_path(constants.OVERLAYS_DIR, *join_paths)
 
@@ -20,3 +20,6 @@ class Settings(object):
 
     def skeletons_path(self, *join_paths):
         return self.base_path(constants.SKELETONS_DIR, *join_paths)
+
+    def database_path(self, *join_paths):
+        return self.base_path(constants.DATABASE_NAME)

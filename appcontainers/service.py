@@ -21,17 +21,27 @@ def create_app_container_object():
 
 class AppContainerService(object):
     """The facade to dealing with app containers."""
-    def __init__(self, resource_service, creator,
+    def __init__(self,
+            resource_service,
+            creator,
+            session,
+            database,
+            resource_repository,
             base_path='/var/lib/appcontainers'):
         self._base_path = base_path
         self._creator = creator
+        self._session = session
         self._resource_service = resource_service
+        self._resource_repository = resource_repository
+        self._database = database
 
     def provision(self, base='base'):
         """Provision a new app container using the default base"""
         # Setup the information for the container
         resource_reservation = self._resource_service.make_reservation()
-        app_container = self._creator.provision_container(base, resource_reservation)
+        app_container = self._creator.provision_container(base,
+                resource_reservation)
+        self._session.commit()
         return ManagedAppContainer(self, app_container)
 
     def service_path(self, *join_paths):
@@ -39,6 +49,15 @@ class AppContainerService(object):
 
     def overlays_path(self, *join_paths):
         return self.service_path(constants.OVERLAYS_DIR, *join_paths)
+
+    def destroy(self, container):
+        container.destroy()
+        self._resource_repository.delete(container._reservation)
+        self._session.commit()
+
+    @property
+    def database(self):
+        return self._database
 
 
 class ManagedAppContainer(object):
@@ -51,7 +70,7 @@ class ManagedAppContainer(object):
         self._container = container
 
     def destroy(self):
-        self._container.destroy()
+        self._service.destroy(self._container)
 
     def start(self):
         return self._container.start()

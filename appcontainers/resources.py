@@ -1,5 +1,6 @@
 import uuid
 import ipaddr
+from persistent.mapping import PersistentMapping
 from .models import ResourceReservation
 from .repository import Repository
 
@@ -47,34 +48,42 @@ class ResourceService(object):
 class ResourceReservationRepository(Repository):
     def all(self):
         """Returns a list of all resources"""
-        reservations = self._reservations
-        return reservations.items()
+        raw_reservations = self._reservations
+        reservations = map(lambda a: self._load(a[1]),
+                raw_reservations.items())
+        return reservations
 
     def find_by_name(self, name):
-        reservation = self._reservations.get(name)
-        if not reservation
+        raw_reservation = self._reservations.get(name)
+        if not raw_reservation:
             raise self.DoesNotExist('ResourceReservation "%s" does not exist'
                 % name)
+        reservation = self._load(raw_reservation)
         return reservation
 
     def save(self, reservation):
-        reservations = self._reservations
-        reservations[reservation.name] = dict(
+        raw_reservations = self._reservations
+        raw_reservations[reservation.name] = dict(
             name=reservation.name,
             ip=reservation.ip,
             mac=reservation.mac,
         )
 
+    def delete(self, reservation):
+        raw_reservations = self._reservations
+        del raw_reservations[reservation.name]
+
     @property
     def _reservations(self):
-        return self._database.root['resource_reservations']
+        raw_reservations = self._database.root.get('resource_reservations')
+        if not raw_reservations:
+            raw_reservations = PersistentMapping()
+            self._database.root['resource_reservations'] = raw_reservations
+        return raw_reservations
 
     def _load(self, raw_data):
         return ResourceReservation.create(raw_data['name'],
                 raw_data['ip'], raw_data['mac'])
-
-    class DoesNotExist(object):
-        pass
 
 
 def available_name(used_names):
