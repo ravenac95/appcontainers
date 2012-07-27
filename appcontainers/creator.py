@@ -1,26 +1,33 @@
 import os
-from .models import AppContainer
+from .models import AppContainer, AncestorInfo
 from .skeleton import SkeletonAssembler
 from .directories import DirectoryList, Directory
 
 
 def setup_app_container_creator(settings, lxc_service,
-        app_container_cls=None, skeleton_assembler=None):
+        app_container_cls=None, skeleton_assembler=None,
+        ancestor_info_cls=None):
+    """Wires together an appropriate AppContainerCreator"""
+    # Perform default wiring if necessary
     skeleton_assembler = skeleton_assembler or SkeletonAssembler()
     app_container_cls = app_container_cls or AppContainer
+    ancestor_info_cls = ancestor_info_cls or AncestorInfo
+
     return AppContainerCreator(settings, lxc_service,
             skeleton_assembler=skeleton_assembler,
-            app_container_cls=app_container_cls)
+            app_container_cls=app_container_cls,
+            ancestor_info_cls=ancestor_info_cls)
 
 
 class AppContainerCreator(object):
     """Coordinates the creation of a new AppContainer"""
-    def __init__(self, settings, lxc_service,
-            skeleton_assembler, app_container_cls):
+    def __init__(self, settings, lxc_service, skeleton_assembler,
+            app_container_cls, ancestor_info_cls):
         self._settings = settings
         self._app_container_cls = app_container_cls
         self._lxc_service = lxc_service
         self._skeleton_assembler = skeleton_assembler
+        self._ancestor_info_cls = ancestor_info_cls
 
     def provision_container(self, base, reservation):
         """Provisions a brand new container
@@ -33,26 +40,29 @@ class AppContainerCreator(object):
         settings = self._settings
         app_container_cls = self._app_container_cls
 
-        # Create the overlay director(y|ies)
-        directory_list = self._create_directory_list(reservation.name)
+        # Create the overlay directory
+        overlay_directory = self._ensure_overlay_directory(reservation.name)
 
         # Create the LXC object
         lxc = self._create_lxc(reservation.name, base,
-                directory_list.as_paths())
+                overlays=[overlay_directory])
 
         # Setup the files in the LXC
         self._skeleton_assembler.setup(settings, lxc, reservation)
 
-        # Create and return an app container for the LXC and it's reservations
-        return app_container_cls.create(base, lxc, reservation, directory_list)
+        # Setup ancestor info
+        ancestor_info = self._ancestor_info_cls.create(base)
 
-    def _create_directory_list(self, name):
-        """Creates overlay directories"""
-        top_overlay = self._settings.overlays_path(name)
+        # Create and return an app container
+        return app_container_cls.create(ancestor_info, lxc, reservation)
+
+    def _ensure_overlay_directory(self, name):
+        """Creates overlay directory"""
+        # FIXME messy right now
+        overlay_path = self._settings.overlays_path(name)
         # Make the directory
-        overlay_dir = Directory.make(top_overlay)
-        directory_list = DirectoryList([overlay_dir])
-        return directory_list
+        overlay_dir = Directory.make(overlay_path)
+        return overlay_dir.path
 
     def _create_lxc(self, name, base, overlays):
         """Creates the LXC object from the given name and overlays"""
