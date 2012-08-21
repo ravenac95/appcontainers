@@ -2,6 +2,7 @@ requirements:
   - ipaddr
   - tempita
   - ZODB3
+  - lxc4u
 
 ---
 profile: development
