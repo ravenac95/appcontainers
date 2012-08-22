@@ -42,7 +42,8 @@ class AppContainerService(object):
         # Setup the information for the container
         app_container_metadata = self._metadata_service.provision_metadata(
                 base, None)
-        app_container = self._creator.provision_container(app_container_metadata)
+        app_container = self._creator.provision_container(
+                app_container_metadata)
         self._session.commit()
         return ManagedAppContainer(self, app_container)
 
@@ -62,7 +63,9 @@ class AppContainerService(object):
         return self._database
 
     def list_containers(self):
-        return self._metadata_repository.all()
+        metadatas = self._metadata_repository.all()
+        app_containers = map(self._loader.load_container, metadatas)
+        return map(lambda a: ManagedAppContainer(self, a), app_containers)
 
 
 class ManagedAppContainer(object):
@@ -73,6 +76,9 @@ class ManagedAppContainer(object):
     def __init__(self, service, container):
         self._service = service
         self._container = container
+
+    def __repr__(self):
+        return '<ManagedAppContainer %s>' % self.name
 
     def destroy(self):
         self._service.destroy(self._container)
