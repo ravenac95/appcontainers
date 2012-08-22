@@ -8,7 +8,7 @@ TEMPLATE_EXTENSION_LENGTH = len(TEMPLATE_EXTENSION)
 
 class SkeletonAssembler(object):
     """Directs the SkeletonWriter"""
-    def setup(self, settings, lxc, reservation):
+    def setup(self, settings, lxc, metadata):
         skeleton_path = settings.skeletons_path('base')
         lxc_path = lxc.path()
         writer = SkeletonWriter(skeleton_path, lxc_path)
@@ -27,7 +27,7 @@ class SkeletonAssembler(object):
                 if filename.endswith(TEMPLATE_EXTENSION):
                     writer.render(file_path,
                             ext_length=TEMPLATE_EXTENSION_LENGTH,
-                            reservation=reservation)
+                            metadata=metadata)
                 # Otherwise
                 else:
                     # Copy the file

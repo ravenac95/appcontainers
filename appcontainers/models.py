@@ -19,33 +19,31 @@ class AncestorInfo(object):
 
 class AppContainer(object):
     @classmethod
-    def create(cls, ancestor_info, lxc, reservation):
+    def create(cls, lxc, metadata):
         """Creates a new app container
 
-        :param base: identifier for the base
-        :type base: str
         :param lxc: This app container's associated LXC
         :type lxc: LXC
-        :param reservation: this AppContainer's ResourceReservation
-        :type reservation: ResourceReservation
-        :param directory_list: A DirectoryList that manages this container's
-            directories
-        :type directory_list: DirectoryList
+        :param metadata: this AppContainer's AppContainerMetadata
+        :type metadata: AppContainerMetadata
         """
-        return cls(ancestor_info, lxc, reservation)
+        return cls(lxc, metadata)
 
-    def __init__(self, ancestor_info, lxc, reservation):
-        self._ancestor_info = ancestor_info
+    def __init__(self, lxc, metadata):
         self.lxc = lxc
-        self._reservation = reservation
+        self._metadata = metadata
 
     @property
     def name(self):
-        return self._reservation.name
+        return self._metadata.name
 
     @property
-    def ancestor_info(self):
-        return self._ancestor_info
+    def base(self):
+        return self._metadata.base
+
+    @property
+    def image(self):
+        return self._metadata.image
 
     def start(self):
         self.lxc.start()
@@ -59,6 +57,23 @@ class AppContainer(object):
 
     def __repr__(self):
         return '<AppContainer [%s]>' % self.name
+
+
+class AppContainerMetadata(object):
+    @classmethod
+    def create(cls, name, ip, mac, base, image=None):
+        return cls(name, ip, mac, base, image)
+
+    def __init__(self, name, ip, mac, base, image):
+        self.name = name
+        self.ip = ip
+        self.mac = mac
+        self.base = base
+        self.image = image
+
+    def __repr__(self):
+        return '<AppContainerMetadata [%s, %s, %s]>' % (self.name,
+                self.ip, self.mac)
 
 
 class ResourceReservation(object):

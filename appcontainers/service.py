@@ -22,25 +22,27 @@ def create_app_container_object():
 class AppContainerService(object):
     """The facade to dealing with app containers."""
     def __init__(self,
-            resource_service,
+            app_container_metadata_service,
             creator,
+            loader,
             session,
             database,
-            resource_repository,
+            app_container_metadata_repository,
             base_path='/var/lib/appcontainers'):
         self._base_path = base_path
         self._creator = creator
+        self._loader = loader
         self._session = session
-        self._resource_service = resource_service
-        self._resource_repository = resource_repository
+        self._metadata_service = app_container_metadata_service
+        self._metadata_repository = app_container_metadata_repository
         self._database = database
 
     def provision(self, base='base'):
         """Provision a new app container using the default base"""
         # Setup the information for the container
-        resource_reservation = self._resource_service.make_reservation()
-        app_container = self._creator.provision_container(base,
-                resource_reservation)
+        app_container_metadata = self._metadata_service.provision_metadata(
+                base, None)
+        app_container = self._creator.provision_container(app_container_metadata)
         self._session.commit()
         return ManagedAppContainer(self, app_container)
 
@@ -52,12 +54,15 @@ class AppContainerService(object):
 
     def destroy(self, container):
         container.destroy()
-        self._resource_repository.delete(container._reservation)
+        self._metadata_repository.delete(container._metadata)
         self._session.commit()
 
     @property
     def database(self):
         return self._database
+
+    def list_containers(self):
+        return self._metadata_repository.all()
 
 
 class ManagedAppContainer(object):

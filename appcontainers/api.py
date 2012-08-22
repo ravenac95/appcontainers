@@ -6,29 +6,34 @@ The appcontainers API
 """
 import lxc4u
 from .service import AppContainerService
-from .resources import setup_resource_service
 from .creator import setup_app_container_creator
+from .loader import setup_app_container_loader
 from .settings import Settings
 from .database import LocalDatabase, Session
+from .metadata import AppContainerMetadataRepository, setup_metadata_service
 from .resources import ResourceReservationRepository
 
 
 def setup_service():
     """Creates an AppContainerService based on the settings"""
+    lxc_service = lxc4u
+
     settings = _create_settings()
 
     database = LocalDatabase.connect(settings.database_path())
 
     session = Session()
 
-    resource_repository = _create_resource_repository(database)
+    metadata_repository = _create_app_container_metadata_repository(database)
 
-    resource_service = setup_resource_service(settings, resource_repository)
+    metadata_service = setup_metadata_service(settings, metadata_repository)
 
-    app_container_creator = setup_app_container_creator(settings, lxc4u)
+    app_container_creator = setup_app_container_creator(settings, lxc_service)
 
-    return AppContainerService(resource_service, app_container_creator,
-            session, database, resource_repository)
+    app_container_loader = setup_app_container_loader(settings, lxc_service)
+
+    return AppContainerService(metadata_service, app_container_creator,
+            app_container_loader, session, database, metadata_repository)
 
 
 def _create_settings(**kwargs):
@@ -57,6 +62,12 @@ def _create_resource_repository(database):
     """Creates a resource repository"""
     resource_repository = ResourceReservationRepository(database)
     return resource_repository
+
+
+def _create_app_container_metadata_repository(database):
+    """Creates a resource repository"""
+    metadata_repository = AppContainerMetadataRepository(database)
+    return metadata_repository
 
 
 def _wire_dependencies():
