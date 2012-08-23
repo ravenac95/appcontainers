@@ -14,8 +14,8 @@ OVERLAYS_TMP_DIR = 'tmp'
 
 IMAGES_DIR = 'images'
 
-CONTAINER_IMAGES_DIR = os.path.join(IMAGES_DIR, 'container')
-CONTAINER_IMAGES_LIB_DIR = os.path.join(CONTAINER_IMAGES_DIR, 'lib')
+IMAGES_CONTAINER_DIR = os.path.join(IMAGES_DIR, 'container')
+IMAGES_LIB_DIR = os.path.join(IMAGES_DIR, 'lib')
 BASE_IMAGES_DIR = os.path.join(IMAGES_DIR, 'base')
 
 IMAGES_USER_DIR = 'container'

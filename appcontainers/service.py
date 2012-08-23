@@ -1,4 +1,5 @@
 import os
+import shutil
 import time
 from . import constants
 from .images import AppContainerImageWriter
@@ -53,10 +54,30 @@ class AppContainerService(object):
     def overlays_path(self, *join_paths):
         return self.service_path(constants.OVERLAYS_DIR, *join_paths)
 
+    def images_path(self, *join_paths):
+        return self.service_path(constants.IMAGES_DIR, *join_paths)
+
     def destroy(self, container):
+        # Destroy container
         container.destroy()
+
+        # Delete the overlay directories
+        shutil.rmtree(self.overlays_path(container.name))
+
+        # Delete the metadata
         self._metadata_repository.delete(container._metadata)
         self._session.commit()
+
+    def make_image(self, container, image_name, image_writer=None):
+        image_writer = image_writer or AppContainerImageWriter.new()
+
+        destination_dir = self.images_path('lib')
+        overlay_source = self.overlays_path(container.name)
+
+        metadata = dict(base=container.base)
+
+        image_writer.create(overlay_source, destination_dir, image_name,
+                metadata)
 
     @property
     def database(self):
@@ -101,19 +122,13 @@ class ManagedAppContainer(object):
     def mac(self):
         return self._container.mac
 
-    def make_image(self, name=None, image_writer=None):
+    def make_image(self, image_name=None, image_writer=None):
         # Setup defaults from args
-        name = name or self._image_name()
-        image_writer = image_writer or AppContainerImageWriter.new()
-
+        image_name = image_name or self._image_name()
         # Setup file_path
-        filename = '%s.%s' % (name, constants.IMAGE_FILE_EXTENSION)
-        file_path = self._service.service_path(
-                constants.CONTAINER_IMAGES_LIB_DIR, filename)
-        self._container.make_image(file_path, image_writer)
-        return file_path
+        self._service.make_image(self._container, image_name, image_writer)
 
     def _image_name(self):
         name = self._container.name
-        timestamp = time.time()
+        timestamp = int(time.time())
         return "%s-%s" % (name, timestamp)
