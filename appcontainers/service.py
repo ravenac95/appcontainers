@@ -93,6 +93,14 @@ class ManagedAppContainer(object):
     def name(self):
         return self._container.name
 
+    @property
+    def ip(self):
+        return self._container.ip
+
+    @property
+    def mac(self):
+        return self._container.mac
+
     def make_image(self, name=None, image_writer=None):
         # Setup defaults from args
         name = name or self._image_name()

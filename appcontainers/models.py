@@ -38,6 +38,14 @@ class AppContainer(object):
         return self._metadata.name
 
     @property
+    def ip(self):
+        return self._metadata.ip
+
+    @property
+    def mac(self):
+        return self._metadata.mac
+
+    @property
     def base(self):
         return self._metadata.base
 
