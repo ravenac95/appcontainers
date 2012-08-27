@@ -2,7 +2,6 @@ import os
 import shutil
 import time
 from . import constants
-from .images import AppContainerImageWriter
 
 
 def create_app_container_object():
@@ -68,20 +67,16 @@ class AppContainerService(object):
         self._metadata_repository.delete(container._metadata)
         self._session.commit()
 
-    def make_image(self, container, image_name, image_writer=None):
-        image_writer = image_writer or AppContainerImageWriter.new()
-
-        destination_dir = self.images_path('lib')
-        overlay_source = self.overlays_path(container.name)
-
-        metadata = dict(base=container.base)
-
-        image_writer.create(overlay_source, destination_dir, image_name,
-                metadata)
-
     @property
     def database(self):
         return self._database
+
+    def make_image(self, container, image_name, image_writer=None):
+        image_filename = "%s.%s" % (image_name, constants.IMAGE_FILE_EXTENSION)
+        image_path = self.images_path('lib', image_filename)
+        container.make_image(image_path, image_name=image_name,
+                image_writer=image_writer)
+        return image_path
 
     def list_containers(self):
         metadatas = self._metadata_repository.all()
@@ -126,7 +121,8 @@ class ManagedAppContainer(object):
         # Setup defaults from args
         image_name = image_name or self._image_name()
         # Setup file_path
-        self._service.make_image(self._container, image_name, image_writer)
+        self._service.make_image(self._container, image_name,
+                image_writer=image_writer)
 
     def _image_name(self):
         name = self._container.name

@@ -1,3 +1,6 @@
+from .images import AppContainerImageWriter
+
+
 class AncestorInfo(object):
     """An object used to describe an app container's ancestry"""
     @classmethod
@@ -65,6 +68,15 @@ class AppContainer(object):
 
     def __repr__(self):
         return '<AppContainer [%s]>' % self.name
+
+    def image_point(self):
+        overlay = self.lxc.top_overlay()
+        return overlay.upper_dir
+
+    def make_image(self, image_path, image_name=None, image_writer=None):
+        """Creates an image of the highest upperdir overlay directory"""
+        image_writer = image_writer or AppContainerImageWriter()
+        image_writer.create(self, image_path, image_name=image_name)
 
 
 class AppContainerMetadata(object):
