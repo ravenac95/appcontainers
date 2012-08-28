@@ -2,25 +2,6 @@ import time
 from .images import AppContainerImageWriter
 
 
-class AncestorInfo(object):
-    """An object used to describe an app container's ancestry"""
-    @classmethod
-    def create(cls, base, image=None):
-        return cls(base, image)
-
-    def __init__(self, base, image):
-        self._base = base
-        self._image = image
-
-    @property
-    def base(self):
-        return self._base
-
-    @property
-    def image(self):
-        return self._image
-
-
 class AppContainer(object):
     @classmethod
     def create(cls, lxc, metadata):
