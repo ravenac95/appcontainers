@@ -83,6 +83,11 @@ class AppContainerService(object):
         app_containers = map(self._loader.load_container, metadatas)
         return map(lambda a: ManagedAppContainer(self, a), app_containers)
 
+    def get(self, name):
+        metadata = self._metadata_repository.find_by_name(name)
+        app_container = self._loader.load_container(metadata)
+        return ManagedAppContainer(self, app_container)
+
     def close(self):
         """Closes the service"""
         self._session.abort()
