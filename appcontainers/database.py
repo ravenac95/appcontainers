@@ -7,6 +7,9 @@ class Session(object):
     def commit(self):
         transaction.commit()
 
+    def abort(self):
+        transaction.abort()
+
 
 class LocalDatabase(object):
     """Facade to ZODB database"""

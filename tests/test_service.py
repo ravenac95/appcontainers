@@ -23,8 +23,9 @@ class TestAppContainerService(object):
         self.mock_container_service = mock_container_service
         self.mock_creator = mock_creator
         self.mock_session = mock_session
+        self.mock_database = mock_database
 
-    def test_service_provision(self):
+    def test_provision(self):
         # Run Test
         base = 'abase'
         image = None
@@ -37,11 +38,17 @@ class TestAppContainerService(object):
                 self.mock_container_service.provision_metadata.return_value)
         self.mock_session.commit.assert_called_with()
 
-    def test_service_service_path(self):
+    def test_service_path(self):
         assert self.service.service_path('hello') == (
             '/var/lib/appcontainers/hello'
         )
 
-    def test_service_overlay_path(self):
+    def test_overlay_path(self):
         expected = '/var/lib/appcontainers/%s/hello' % constants.OVERLAYS_DIR
         assert self.service.overlays_path('hello') == expected
+
+    def test_close(self):
+        self.service.close()
+
+        self.mock_session.abort.assert_called_with()
+        self.mock_database.close.assert_called_with()
