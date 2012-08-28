@@ -74,7 +74,8 @@ class AppContainerMetadataRepository(Repository):
         del raw_metadatas[metadata.name]
 
     def delete_by_name(self, name):
-        raise NotImplementedError('Fix me. I do not work')
+        raw_metadatas = self._metadatas
+        del raw_metadatas[name]
 
     @property
     def _metadatas(self):
