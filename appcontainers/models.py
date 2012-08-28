@@ -1,3 +1,4 @@
+import time
 from .images import AppContainerImageWriter
 
 
@@ -57,10 +58,26 @@ class AppContainer(object):
         return self._metadata.image
 
     def start(self):
-        self.lxc.start()
+        lxc = self.lxc
+        lxc.start()
+
+        # Wait
+        while True:
+            time.sleep(0.1)
+            status = lxc.status
+            if status == 'RUNNING':
+                break
 
     def stop(self):
-        self.lxc.stop()
+        lxc = self.lxc
+        lxc.stop()
+
+        # Wait
+        while True:
+            time.sleep(0.1)
+            status = lxc.status
+            if status != 'RUNNING':
+                break
 
     def destroy(self):
         # Destroy LXC
