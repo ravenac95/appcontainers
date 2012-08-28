@@ -21,7 +21,7 @@ class TestSkeletonAssembler(object):
         # FIXME this is a complicated test :-/
         mock_settings = Mock()
         mock_lxc = Mock()
-        mock_reservation = Mock()
+        mock_metadata = Mock()
 
         # Setup Writer
         mock_writer = mock_writer_cls.return_value
@@ -35,18 +35,19 @@ class TestSkeletonAssembler(object):
             ('/base/somedir/hello', [], ['hello.tmpl', 'world']),
         ]
 
-        self.assembler.setup(mock_settings, mock_lxc, mock_reservation)
+        self.assembler.setup(mock_settings, mock_lxc, mock_metadata)
 
         #### SkeletonWriter.render assertions
 
         # Expected render calls
-        common_kwargs = dict(ext_length=ANY, reservation=mock_reservation)
+        common_kwargs = dict(ext_length=ANY, metadata=mock_metadata)
         expected_render_calls = [
             call('somedir/one.sh.tmpl', **common_kwargs),
             call('somedir/hello/hello.tmpl', **common_kwargs),
         ]
         # Order shouldn't matter as long as all the files are made correctly
-        mock_writer.render.assert_has_calls(expected_render_calls, any_order=True)
+        mock_writer.render.assert_has_calls(expected_render_calls,
+                any_order=True)
 
         #### SkeletonWriter.copy assertions
         expected_copy_calls = [
@@ -68,11 +69,11 @@ class TestSkeletonWriter(object):
     def test_generate_path_pair(self):
         tests = [
             (('hello', 0), ('/base/hello', '/lxc/hello')),
-            (('hello/there.tmpl', 5), ('/base/hello/there.tmpl', '/lxc/hello/there')),
+            (('hello/there.tmpl', 5), ('/base/hello/there.tmpl',
+                '/lxc/hello/there')),
         ]
         for test_args, expected in tests:
             yield self.do_generate_path_pair, test_args, expected
-
 
     def do_generate_path_pair(self, test_args, expected):
         path_pair = self.writer.generate_path_pair(*test_args)
@@ -118,7 +119,7 @@ class TestSkeletonAssemblerWithFixtures(object):
         mock_lxc.path.return_value = temp_dir
 
         # Fake Reservation
-        fake_reservation = FakeResourceReservation('SOMENAME', 
+        fake_reservation = FakeResourceReservation('SOMENAME',
                 '192.168.0.1', '00:16:3e:00:00:01')
 
         return (mock_settings, mock_lxc, fake_reservation)
@@ -126,10 +127,10 @@ class TestSkeletonAssemblerWithFixtures(object):
     def assert_identical_dirs(self, test_dir, expected_dir, message=None):
         comparison = filecmp.dircmp(test_dir, expected_dir)
 
-        if (comparison.diff_files or comparison.right_only 
+        if (comparison.diff_files or comparison.right_only
                 or comparison.left_only):
             raise AssertionError('Directories do not match')
-    
+
     def test_with_skeleton1_fixture(self):
         skeleton1_input = fixtures_path('skeleton1/input')
         skeleton1_expected = fixtures_path('skeleton1/expected')
