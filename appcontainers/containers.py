@@ -1,38 +1,4 @@
 from .repository import Repository
-from .models. import AppContainer, AncestorInfo
-
-
-def setup_app_container_loader(lxc_service, resource_repository,
-        app_container_cls=None, ancestor_info_cls=None):
-    app_container_cls = app_container_cls or AppContainer
-    ancestor_info_cls = ancestor_info_cls or AncestorInfo
-
-    return AppContainerLoader(lxc_service, resource_repository,
-            app_container_cls, ancestor_info_cls)
-
-
-class AppContainerLoader(object):
-    def __init__(self, lxc_service, resource_repository,
-            app_container_cls, ancestor_info_cls):
-        self._lxc_service = lxc_service
-        self._resource_repository = resource_repository
-        self._app_container_cls = app_container_cls
-        self._ancestor_info_cls = ancestor_info_cls
-
-    def load(self, raw_data):
-        name = raw_data['name']
-        raw_ancestor_info = raw_data['ancestor_info']
-        # Get related reservation
-        ancestor_info = self._ancestor_info_cls.create(**ancestor_info)
-
-        # Load LXC
-        lxc = self._lxc_service.get(name)
-
-        # Get Reservation
-        reservation = self._resource_repository.find_by_name(name)
-
-        # Create the app_container
-        return self._app_container_cls.create(ancestor_info, lxc, reservation)
 
 
 class AppContainerRepository(Repository):

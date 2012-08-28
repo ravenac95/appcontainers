@@ -16,19 +16,12 @@ from .metadata import AppContainerMetadataRepository, setup_metadata_service
 def setup_service():
     """Creates an AppContainerService based on the settings"""
     lxc_service = lxc4u
-
     settings = _create_settings()
-
     database = LocalDatabase.connect(settings.database_path())
-
     session = Session()
-
     metadata_repository = _create_app_container_metadata_repository(database)
-
     metadata_service = setup_metadata_service(settings, metadata_repository)
-
     app_container_creator = setup_app_container_creator(settings, lxc_service)
-
     app_container_loader = setup_app_container_loader(settings, lxc_service)
 
     return AppContainerService(metadata_service, app_container_creator,

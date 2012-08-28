@@ -64,7 +64,7 @@ class AppContainerService(object):
         shutil.rmtree(self.overlays_path(container.name))
 
         # Delete the metadata
-        self._metadata_repository.delete(container._metadata)
+        self._metadata_repository.delete_by_name(container.name)
         self._session.commit()
 
     @property

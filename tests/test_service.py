@@ -1,4 +1,4 @@
-from mock import Mock, call, patch
+from mock import Mock, call, patch, create_autospec
 from nose.tools import eq_
 from appcontainers import constants
 from appcontainers.service import *
@@ -6,12 +6,18 @@ from appcontainers.service import *
 
 class TestAppContainerService(object):
     def setup(self):
+        # This import provides some introspection so we don't screw things up
+        # too bad but still maintain some separation by not executing the
+        # related code
+        from appcontainers.metadata import AppContainerMetadataRepository
+
         mock_container_service = Mock()
         mock_creator = Mock()
         mock_session = Mock()
         mock_database = Mock()
         mock_loader = Mock()
-        mock_container_repository = Mock()
+        mock_container_repository = create_autospec(
+                AppContainerMetadataRepository)
         self.managed_container_patch = patch(
                 'appcontainers.service.ManagedAppContainer', autospec=True)
         self.mock_managed_container_cls = self.managed_container_patch.start()
@@ -89,3 +95,27 @@ class TestAppContainerService(object):
 
         self.mock_session.abort.assert_called_with()
         self.mock_database.close.assert_called_with()
+
+    def test_make_image(self):
+        mock_container = Mock()
+        mock_image_writer = Mock()
+        mock_images_path = self.service.images_path = Mock()
+        image_name = 'name'
+        self.service.make_image(mock_container, image_name,
+                image_writer=mock_image_writer)
+
+        mock_container.make_image.assert_called_with(
+                mock_images_path.return_value,
+                image_name=image_name,
+                image_writer=mock_image_writer)
+
+    @patch('shutil.rmtree')
+    def test_destroy(self, mock_rmtree):
+        mock_container = Mock()
+        self.service.destroy(mock_container)
+
+        eq_(mock_rmtree.called, True)
+        mock_container.destroy.assert_called_with()
+        self.mock_container_repository.delete_by_name.assert_called_with(
+                mock_container.name)
+        self.mock_session.commit.assert_called_with()
