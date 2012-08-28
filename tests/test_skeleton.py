@@ -119,10 +119,10 @@ class TestSkeletonAssemblerWithFixtures(object):
         mock_lxc.path.return_value = temp_dir
 
         # Fake Reservation
-        fake_reservation = FakeResourceReservation('SOMENAME',
-                '192.168.0.1', '00:16:3e:00:00:01')
+        fake_metadata = FakeAppContainerMetadata('SOMENAME',
+                '192.168.0.1', '00:16:3e:00:00:01', 'base')
 
-        return (mock_settings, mock_lxc, fake_reservation)
+        return (mock_settings, mock_lxc, fake_metadata)
 
     def assert_identical_dirs(self, test_dir, expected_dir, message=None):
         comparison = filecmp.dircmp(test_dir, expected_dir)

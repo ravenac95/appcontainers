@@ -11,7 +11,6 @@ from .loader import setup_app_container_loader
 from .settings import Settings
 from .database import LocalDatabase, Session
 from .metadata import AppContainerMetadataRepository, setup_metadata_service
-from .resources import ResourceReservationRepository
 
 
 def setup_service():
@@ -43,25 +42,6 @@ def _create_settings(**kwargs):
             network=ipaddr.IPv4Network('192.168.0.0/24'),
             mac_range=['02:16:3e:00:00:00', '02:16:3e:00:01:00'])
     return settings
-
-
-def _create_fake_resource_repository(database):
-    """Creates a resource repository"""
-    # FIXME FAKED
-    from tests.fakes import FakeResourceReservationRepository
-    resource_repository = FakeResourceReservationRepository()
-    resource_repository._setup_resources([
-        ('alpha', '192.168.0.1', '00:16:3e:00:00:00'),
-        ('bravo', '192.168.0.2', '00:16:3e:00:00:01'),
-        ('charlie', '192.168.0.3', '00:16:3e:00:00:02'),
-    ])
-    return resource_repository
-
-
-def _create_resource_repository(database):
-    """Creates a resource repository"""
-    resource_repository = ResourceReservationRepository(database)
-    return resource_repository
 
 
 def _create_app_container_metadata_repository(database):
