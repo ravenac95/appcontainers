@@ -117,6 +117,10 @@ class ManagedAppContainer(object):
     def mac(self):
         return self._container.mac
 
+    @property
+    def unmanaged_container(self):
+        return self._container
+
     def make_image(self, image_name=None, image_writer=None):
         # Setup defaults from args
         image_name = image_name or self._image_name()
