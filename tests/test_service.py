@@ -5,30 +5,36 @@ from appcontainers.service import *
 
 class TestAppContainerService(object):
     def setup(self):
-        mock_resource_service = Mock()
+        mock_container_service = Mock()
         mock_creator = Mock()
         mock_session = Mock()
         mock_database = Mock()
-        mock_resource_repository = Mock()
+        mock_loader = Mock()
+        mock_container_repository = Mock()
         self.service = AppContainerService(
-                resource_service=mock_resource_service,
+                app_container_metadata_service=mock_container_service,
+                creator=mock_creator,
+                loader=mock_loader,
                 session=mock_session,
                 database=mock_database,
-                resource_repository=mock_resource_repository,
-                creator=mock_creator)
-        self.mock_resource_service = mock_resource_service
+                app_container_metadata_repository=mock_container_repository,
+                base_path='/var/lib/appcontainers'
+                )
+        self.mock_container_service = mock_container_service
         self.mock_creator = mock_creator
         self.mock_session = mock_session
 
     def test_service_provision(self):
         # Run Test
         base = 'abase'
+        image = None
         self.service.provision(base=base)
 
         # Assertions
-        self.mock_resource_service.make_reservation.assert_called_with()
-        self.mock_creator.provision_container.assert_called_with(base,
-                self.mock_resource_service.make_reservation.return_value)
+        self.mock_container_service.provision_metadata.assert_called_with(base,
+                image)
+        self.mock_creator.provision_container.assert_called_with(
+                self.mock_container_service.provision_metadata.return_value)
         self.mock_session.commit.assert_called_with()
 
     def test_service_service_path(self):
